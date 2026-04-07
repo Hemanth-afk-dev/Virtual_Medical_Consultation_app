@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const PharmacistDashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,6 +23,7 @@ const PharmacistDashboard = () => {
     markNotificationAsRead,
     markAllNotificationsAsRead,
   } = useAppContext();
+  const { selectedLanguage, setSelectedLanguage, languageOptions, t } = useLanguage();
 
   const [activeSection, setActiveSection] = useState(searchParams.get('section') || 'dashboard');
   const [showNotifications, setShowNotifications] = useState(false);
@@ -56,6 +58,12 @@ const PharmacistDashboard = () => {
     setActiveSection(section);
     setSearchParams({ section });
   };
+
+  const formatInr = (amount) => new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(Number(amount || 0));
 
   // Get data
   const stats = getPharmacistStats();
@@ -142,10 +150,18 @@ const PharmacistDashboard = () => {
       {/* Header */}
       <div className="dashboard-header">
         <div className="greeting">
-          <h1>Pharmacy Dashboard 💊</h1>
+          <h1>{t('Pharmacy Dashboard')} 💊</h1>
           <p>Welcome back, {currentUser.name}. Manage prescriptions and orders.</p>
         </div>
         <div className="header-actions">
+          <label className="patient-language-select">
+            <span>{t('Choose Language')}</span>
+            <select value={selectedLanguage} onChange={(e) => setSelectedLanguage(e.target.value)}>
+              {languageOptions.map((lang) => (
+                <option key={lang} value={lang}>{lang}</option>
+              ))}
+            </select>
+          </label>
           <div className="notification-bell" onClick={() => setShowNotifications(!showNotifications)}>
             <span className="bell-icon">🔔</span>
             {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
@@ -160,14 +176,14 @@ const PharmacistDashboard = () => {
       {showNotifications && (
         <div className="notifications-dropdown">
           <div className="notifications-header">
-            <h3>Notifications</h3>
+            <h3>{t('Notifications')}</h3>
             {unreadCount > 0 && (
-              <button onClick={() => markAllNotificationsAsRead(currentUser.id)}>Mark all read</button>
+              <button onClick={() => markAllNotificationsAsRead(currentUser.id)}>{t('Mark all read')}</button>
             )}
           </div>
           <div className="notifications-list">
             {notifications.length === 0 ? (
-              <div className="empty-notifications">No notifications</div>
+              <div className="empty-notifications">{t('No notifications')}</div>
             ) : (
               notifications.slice(0, 5).map(notification => (
                 <div 
@@ -193,25 +209,25 @@ const PharmacistDashboard = () => {
           className={`nav-tab ${activeSection === 'dashboard' ? 'active' : ''}`}
           onClick={() => handleSectionChange('dashboard')}
         >
-          <span>🏠</span> Dashboard
+          <span>🏠</span> {t('Dashboard')}
         </button>
         <button 
           className={`nav-tab ${activeSection === 'prescriptions' ? 'active' : ''}`}
           onClick={() => handleSectionChange('prescriptions')}
         >
-          <span>📋</span> Prescriptions
+          <span>📋</span> {t('Prescriptions')}
         </button>
         <button 
           className={`nav-tab ${activeSection === 'orders' ? 'active' : ''}`}
           onClick={() => handleSectionChange('orders')}
         >
-          <span>📦</span> Orders
+          <span>📦</span> {t('Orders')}
         </button>
         <button 
           className={`nav-tab ${activeSection === 'inventory' ? 'active' : ''}`}
           onClick={() => handleSectionChange('inventory')}
         >
-          <span>🏪</span> Inventory
+          <span>🏪</span> {t('Inventory')}
         </button>
         <button 
           className={`nav-tab ${activeSection === 'delivery' ? 'active' : ''}`}
@@ -501,7 +517,7 @@ const PharmacistDashboard = () => {
                             )}
                           </div>
                         </td>
-                        <td className="amount-cell">${order.totalAmount.toFixed(2)}</td>
+                        <td className="amount-cell">{formatInr(order.totalAmount)}</td>
                         <td>
                           <span className={`badge ${getStatusColor(order.status)}`}>{order.status}</span>
                         </td>
@@ -609,7 +625,7 @@ const PharmacistDashboard = () => {
                         </div>
                       </td>
                       <td>{item.minStock}</td>
-                      <td>${item.price.toFixed(2)}</td>
+                      <td>{formatInr(item.price)}</td>
                       <td>{item.supplier}</td>
                       <td>
                         <span className={`expiry-date ${new Date(item.expiryDate) < new Date(Date.now() + 90*24*60*60*1000) ? 'expiring-soon' : ''}`}>
@@ -687,7 +703,7 @@ const PharmacistDashboard = () => {
 
                           <div className="delivery-items">
                             <h5>Items: {order.medicines.length}</h5>
-                            <p>Total: ${order.totalAmount.toFixed(2)}</p>
+                            <p>Total: {formatInr(order.totalAmount)}</p>
                           </div>
                         </div>
 
@@ -881,7 +897,7 @@ const PharmacistDashboard = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <label>Price ($)</label>
+                    <label>Price (INR)</label>
                     <input
                       type="number"
                       step="0.01"

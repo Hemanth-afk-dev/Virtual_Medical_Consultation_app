@@ -9,6 +9,7 @@ const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
     role: 'Patient',
@@ -45,6 +46,10 @@ const Register = () => {
       setError('Please enter a valid email address');
       return false;
     }
+    if (formData.phone.trim() && !/^\+?[0-9\s-]{10,15}$/.test(formData.phone.trim())) {
+      setError('Please enter a valid phone number');
+      return false;
+    }
     if (!formData.password) {
       setError('Please enter a password');
       return false;
@@ -67,12 +72,13 @@ const Register = () => {
 
     setLoading(true);
 
-    setTimeout(() => {
-      const result = registerUser(
+    setTimeout(async () => {
+      const result = await registerUser(
         formData.name,
         formData.email,
         formData.password,
-        formData.role
+        formData.role,
+        formData.phone
       );
 
       if (result.success) {
@@ -136,6 +142,21 @@ const Register = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your email"
+              className="auth-input"
+            />
+          </div>
+
+          <div className="auth-form-group">
+            <label className="auth-label">
+              <span className="label-icon">📱</span>
+              Phone Number (optional)
+            </label>
+            <input
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="Enter your mobile number"
               className="auth-input"
             />
           </div>
