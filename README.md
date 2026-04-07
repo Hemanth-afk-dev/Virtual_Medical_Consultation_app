@@ -1,234 +1,156 @@
 # 🏥 MediConnect - Medical Management System
 
-A complete frontend-only React application for managing medical appointments, prescriptions, and medicine orders.
+A full-stack healthcare application with a React frontend and a Spring Boot backend.
 
 ## 📋 Project Overview
 
-MediConnect is a comprehensive healthcare management system built with React, featuring role-based dashboards for Admins, Doctors, Patients, and Pharmacists. The system manages:
+MediConnect is a complete medical management system built with:
+- **React + Vite** for the frontend
+- **Spring Boot + Spring Data JPA** for the backend
+- **MySQL** for persistent storage
 
-- **Appointments**: Patients can book appointments with doctors
-- **Prescriptions**: Doctors can create prescriptions for accepted appointments
-- **Medicine Orders**: Pharmacists can manage medicine orders from prescriptions
-- **User Management**: Admins can view and manage all system users
+The application supports role-based dashboards for Admins, Doctors, Patients, and Pharmacists.
 
-## 🎯 Features
+## 🧩 What’s Included
 
-### Patient Features
-- ✅ View available doctors with specializations
-- ✅ Book appointments by selecting doctor and date
-- ✅ Track appointment status (Requested, Accepted, Completed, Rejected)
-- ✅ View prescribed medicines from doctors
-- ✅ Track medicine order status (Preparing, Ready, Delivered)
+### Frontend
+- React 18.2.0
+- React Router DOM 6.20.0
+- Vite 5.0.0
+- Global state using React Context
+- UI for login, role dashboards, appointments, prescriptions, orders, and admin views
 
-### Doctor Features
-- ✅ View pending appointment requests
-- ✅ Accept or reject appointments
-- ✅ Add prescriptions for accepted appointments
-- ✅ View all appointments (accepted and completed)
-
-### Pharmacist Features
-- ✅ View all available prescriptions
-- ✅ Create medicine orders from prescriptions
-- ✅ Update order status (Preparing → Ready → Delivered)
-- ✅ Track patient information for orders
-
-### Admin Features
-- ✅ View all system users (grouped by role)
-- ✅ Monitor all appointments with details
-- ✅ View system statistics and reports
-- ✅ Track appointment approval rates
+### Backend
+- Spring Boot 3.3.4
+- Spring Web
+- Spring Data JPA
+- MySQL connector
+- REST APIs for authentication, users, doctors, appointments, prescriptions, orders, inventory, lab reports, notifications, health records, and admin operations
 
 ## 📁 Project Structure
 
 ```
-MediConnect/
+Final/
+├── backend/
+│   ├── pom.xml
+│   ├── application.properties
+│   ├── src/main/java/com/mediconnect/backend/
+│   │   ├── controller/
+│   │   ├── dto/
+│   │   ├── model/
+│   │   ├── repository/
+│   │   ├── service/
+│   │   └── config/
+│   └── src/main/resources/
+│       └── application.properties
+├── index.html
+├── package.json
+├── package-lock.json
 ├── src/
-│   ├── App.jsx                      # Main app with routing
-│   ├── main.jsx                     # React entry point
-│   ├── context/
-│   │   └── AppContext.jsx           # Global state management
-│   ├── pages/
-│   │   ├── Login.jsx                # Login page
-│   │   ├── AdminDashboard.jsx       # Admin dashboard
-│   │   ├── DoctorDashboard.jsx      # Doctor dashboard
-│   │   ├── PatientDashboard.jsx     # Patient dashboard
-│   │   └── PharmacistDashboard.jsx  # Pharmacist dashboard
+│   ├── App.jsx
+│   ├── main.jsx
 │   ├── components/
-│   │   ├── Navbar.jsx               # Navigation bar
-│   │   ├── Sidebar.jsx              # Sidebar menu
-│   │   ├── AppointmentCard.jsx      # Appointment card component
-│   │   └── PrescriptionCard.jsx     # Prescription card component
+│   ├── context/
+│   ├── pages/
 │   └── styles/
-│       └── index.css                # Global styles
-├── index.html                       # HTML template
-├── package.json                     # Dependencies
-├── vite.config.js                   # Vite configuration
-└── .gitignore                       # Git ignore file
+├── vite.config.js
+└── .gitignore
 ```
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
-### Prerequisites
-- Node.js (v14 or higher)
-- npm or yarn
-
-### Installation
-
-1. **Install dependencies**
+### Frontend
+1. Install dependencies
    ```bash
    npm install
    ```
-
-2. **Start development server**
+2. Start the frontend dev server
    ```bash
    npm run dev
    ```
-
-3. **Build for production**
-   ```bash
-   npm run build
+3. Open the app in the browser at:
+   ```text
+   http://127.0.0.1:5173/
    ```
 
-4. **Preview production build**
+### Backend
+1. Ensure MySQL is running locally on port `3306`
+2. Create a database named `mediconnectdb` or let Spring Boot create it
+3. Update `backend/application.properties` if needed
+4. Run the backend JAR or build with Maven
    ```bash
-   npm run preview
+   cd backend
+   java -jar target/mediconnect-backend-0.0.1-SNAPSHOT.jar
+   ```
+5. The backend will run at:
+   ```text
+   http://127.0.0.1:8080/
    ```
 
-## 🔐 Demo Users
+## 🔧 Backend MySQL Configuration
 
-The application comes with pre-configured demo users for testing:
+The backend is configured to use MySQL in `backend/application.properties`:
 
-### Admin
-- **Name**: Admin User
-- **Role**: Admin
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/mediconnectdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&defaultAuthenticationPlugin=mysql_native_password&createDatabaseIfNotExist=true
+spring.datasource.username=mediconnect
+spring.datasource.password=MediaConnect@123
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+spring.jpa.hibernate.ddl-auto=update
+```
 
-### Doctors
-- **Name**: Dr. Ananya Rao (Cardiologist)
-- **Name**: Dr. Arjun Menon (Neurologist)
-- **Name**: Dr. Meera Iyer (Pediatrician)
+> If your MySQL username/password differ, update the file before starting the backend.
 
-### Patients
-- **Name**: Rahul Sharma
-- **Name**: Neha Gupta
-- **Name**: Kiran Patel
+## 📌 Backend API Highlights
 
-### Pharmacist
-- **Name**: Priyanka Das
+- `POST /api/auth/login`
+- `POST /api/auth/register`
+- `GET /api/users`
+- `GET /api/doctors`
+- `POST /api/appointments`
+- `PATCH /api/appointments/{id}/status`
+- `POST /api/prescriptions`
+- `GET /api/prescriptions/patient/{patientId}`
+- `POST /api/orders`
+- `PATCH /api/orders/{id}/status`
+- `GET /api/inventory`
+- `GET /api/lab-reports/patient/{patientId}`
+- `GET /api/health-records/patient/{patientId}`
+- `GET /api/admin/stats`
 
-## 🏗️ Technology Stack
+## 🎯 Frontend Features
 
-- **Frontend Framework**: React 18.2.0
-- **Routing**: React Router DOM 6.20.0
-- **State Management**: React Context API + Hooks
-- **Build Tool**: Vite 5.0.0
-- **Styling**: CSS3 (Flexbox, Grid)
-- **Language**: JavaScript (JSX only, no TypeScript)
+- Patient appointment booking and tracking
+- Doctor appointment approval and prescription creation
+- Pharmacist order processing and status updates
+- Admin user management, statistics, and verification
+- Role-based dashboards and navigation
 
-## 💾 State Management Architecture
+## 🧪 Running the App Locally
 
-### Global State (AppContext)
-- `currentUser` - Currently logged-in user
-- `users` - Mock user database
-- `doctors` - Available doctors list
-- `appointments` - All appointments
-- `prescriptions` - All prescriptions
-- `medicineOrders` - All medicine orders
-
-### State Functions
-- `loginUser(name, role)` - Authenticate user
-- `logoutUser()` - Logout current user
-- `bookAppointment(doctorId, patientId, date, symptoms)` - Book appointment
-- `updateAppointmentStatus(appointmentId, status)` - Update appointment
-- `addPrescription(appointmentId, doctorId, medicines, notes)` - Add prescription
-- `createMedicineOrder(prescriptionId, patientId, medicines)` - Create order
-- `updateMedicineOrderStatus(orderId, status)` - Update order status
-
-## 🎨 Design System
-
-### Color Scheme
-- **Primary**: #1e3a8a (Deep Blue)
-- **Secondary**: #3b82f6 (Sky Blue)
-- **Success**: #10b981 (Green)
-- **Warning**: #f59e0b (Amber)
-- **Danger**: #ef4444 (Red)
-
-### Components
-- Card-based layout
-- Responsive grid system
-- Status badges
-- Interactive forms
-- Data tables
-- Empty states
-
-## 🔄 Data Flow & Interconnections
-
-1. **Patient Books Appointment**
-   - Appointment appears in Doctor Dashboard (Pending)
-
-2. **Doctor Accepts Appointment**
-   - Status updates to "Accepted" in Patient Dashboard
-   - Accessible to add prescription
-
-3. **Doctor Adds Prescription**
-   - Prescription visible to Pharmacist
-   - Appointment status changes to "Completed"
-
-4. **Pharmacist Creates Medicine Order**
-   - Order visible to Patient in "Medicine Orders" tab
-   - Initial status: "Preparing"
-
-5. **Pharmacist Updates Order Status**
-   - Patient can track order: Preparing → Ready → Delivered
-
-## 📱 Responsive Design
-
-- Desktop-first design
-- Mobile-friendly layout
-- Flexible grid system
-- Responsive navigation
-
-## ✨ Key Features Implemented
-
-✅ **Role-Based Access Control**: Different dashboards for each role
-✅ **Real-time State Management**: Context API for instant updates
-✅ **Appointment Management**: Full lifecycle from booking to completion
-✅ **Prescription System**: Doctors can prescribe after appointments
-✅ **Order Tracking**: Patients can track medicine orders
-✅ **User Management**: Admin dashboard with user statistics
-✅ **Protected Routes**: Authentication required for dashboard access
-✅ **Clean UI/UX**: Professional medical theme with intuitive navigation
-✅ **Form Validation**: Input validation for all forms
-✅ **Mock Data**: Pre-populated with realistic healthcare data
-
-## 🛠️ Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Create production build
-- `npm run preview` - Preview production build locally
+- Frontend: `http://127.0.0.1:5173/`
+- Backend: `http://127.0.0.1:8080/`
 
 ## 📝 Notes
 
-- **No Backend**: All data is stored in React Context (in-memory)
-- **No Database**: Demo data resets on page refresh
-- **No Authentication Server**: Simple role-based login
-- **Frontend Only**: No API calls or external services
-- **JSX Only**: No TypeScript, pure JavaScript with JSX syntax
+- The frontend is a complete React SPA with role-based pages.
+- The backend is a Spring Boot REST API using MySQL.
+- The current repository includes both frontend and backend code.
+- Remove generated build artifacts from version control if you want a cleaner Git history.
 
-## 🎯 Future Enhancements
+## 🚀 Recommended Improvements
 
-- Backend API integration
-- Database integration
-- User authentication with JWT
-- Real-time notifications
-- Advanced search and filtering
-- Data persistence
-- Export functionality
-- Mobile app
+- Add Git LFS for large backend build artifacts
+- Add a `.gitignore` entry for `backend/target/`
+- Add a detailed backend README inside `backend/`
+- Add Docker support for MySQL and backend
+- Add automated tests for frontend and backend
 
 ## 📄 License
 
-This project is open source and available under the MIT License.
+This project is open source under the MIT License.
 
 ---
 
-**Built with ❤️ using React & Vite**
+**Built with ❤️ using React, Vite, Spring Boot, and MySQL**
