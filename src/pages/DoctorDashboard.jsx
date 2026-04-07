@@ -98,6 +98,51 @@ const DoctorDashboard = () => {
   const completedAppointments = getCompletedAppointmentsForDoctor(currentUser.id);
   const myPrescriptions = getPrescriptionsByDoctor(currentUser.id);
   const myPatients = getPatientsForDoctor(currentUser.id);
+
+  const getPatientRiskCategory = (patient) => {
+    const conditionCount = patient?.profile?.conditions?.length || 0;
+    const allergyCount = patient?.profile?.allergies?.length || 0;
+    if (conditionCount + allergyCount >= 3) return 'High Risk';
+    if (conditionCount + allergyCount >= 1) return 'Monitor';
+    return 'Stable';
+  };
+
+  const hasPrescriptionForAppointment = (appointmentId) =>
+    myPrescriptions.some((prescription) => prescription.appointmentId === appointmentId);
+  const isVideoAppointment = (appointment) =>
+    (appointment?.type || '').toString().trim().toLowerCase() === 'video';
+  const matchesAppointmentFilters = (appointment) => {
+    const patient = getUserById(appointment.patientId);
+    const query = appointmentSearchQuery.trim().toLowerCase();
+
+    if (appointmentTypeFilter !== 'all' && (appointment.type || '').toLowerCase() !== appointmentTypeFilter) {
+      return false;
+    }
+
+    if (appointmentStatusFilter !== 'all' && (appointment.status || '').toLowerCase() !== appointmentStatusFilter) {
+      return false;
+    }
+
+    if (!query) {
+      return true;
+    }
+
+    const haystack = [
+      patient?.name || '',
+      patient?.email || '',
+      patient?.phone || '',
+      appointment?.symptoms || '',
+      appointment?.date || '',
+      appointment?.time || '',
+      appointment?.type || '',
+      appointment?.status || '',
+    ]
+      .join(' ')
+      .toLowerCase();
+
+    return haystack.includes(query);
+  };
+
   const notifications = getNotificationsByUser(currentUser.id);
   const unreadCount = getUnreadNotificationsCount(currentUser.id);
   const completedToday = completedAppointments.filter((apt) => apt.date === new Date().toISOString().split('T')[0]).length;
@@ -235,48 +280,6 @@ const DoctorDashboard = () => {
     );
   });
 
-  const getPatientRiskCategory = (patient) => {
-    const conditionCount = patient?.profile?.conditions?.length || 0;
-    const allergyCount = patient?.profile?.allergies?.length || 0;
-    if (conditionCount + allergyCount >= 3) return 'High Risk';
-    if (conditionCount + allergyCount >= 1) return 'Monitor';
-    return 'Stable';
-  };
-  const hasPrescriptionForAppointment = (appointmentId) =>
-    myPrescriptions.some((prescription) => prescription.appointmentId === appointmentId);
-  const isVideoAppointment = (appointment) =>
-    (appointment?.type || '').toString().trim().toLowerCase() === 'video';
-  const matchesAppointmentFilters = (appointment) => {
-    const patient = getUserById(appointment.patientId);
-    const query = appointmentSearchQuery.trim().toLowerCase();
-
-    if (appointmentTypeFilter !== 'all' && (appointment.type || '').toLowerCase() !== appointmentTypeFilter) {
-      return false;
-    }
-
-    if (appointmentStatusFilter !== 'all' && (appointment.status || '').toLowerCase() !== appointmentStatusFilter) {
-      return false;
-    }
-
-    if (!query) {
-      return true;
-    }
-
-    const haystack = [
-      patient?.name || '',
-      patient?.email || '',
-      patient?.phone || '',
-      appointment?.symptoms || '',
-      appointment?.date || '',
-      appointment?.time || '',
-      appointment?.type || '',
-      appointment?.status || '',
-    ]
-      .join(' ')
-      .toLowerCase();
-
-    return haystack.includes(query);
-  };
   const filteredPendingRequests = pendingRequests.filter(matchesAppointmentFilters);
   const filteredTodayAppointments = todayAppointments.filter(matchesAppointmentFilters);
   const filteredUpcomingAppointments = upcomingAppointments.filter(matchesAppointmentFilters);
